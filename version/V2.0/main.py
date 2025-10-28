@@ -5,10 +5,7 @@ import requests
 import subprocess
 
 # Version actuelle
-version_actuelle = "V2.0"
-
-OWNER = "yo-le-zz"
-REPO = "Version-checker"
+version_actuelle = "V1.0"
 
 # dossier parent
 dst = os.path.dirname(os.path.abspath(__file__))
@@ -138,7 +135,7 @@ def delete(path):
 print("🚀 Téléchargement de la nouvelle version...")
 download_github_folder(
     owner="yo-le-zz",
-    repo="test-version-checker",
+    repo="Version-checker",
     path=f"version/{new_version}",
     output_dir=f"{new_version}"
 )
@@ -152,21 +149,13 @@ if os.path.exists(main_path):
     delete(main_path)
 
 src = get_src_path()
-print(f"📦 Installation de la nouvelle version depuis le project telecharger...")
+print(f"📦 Installation de la nouvelle version depuis {src}...")
 
-src_dir = os.path.join(dst, new_version)
-if os.path.exists(src_dir):
-    for item in os.listdir(src_dir):
-        s = os.path.join(src_dir, item)
-        d = os.path.join(dst, item)
-        if os.path.isdir(s):
-            if os.path.exists(d):
-                shutil.rmtree(d)
-            shutil.move(s, d)
-        else:
-            shutil.move(s, d)
-else:
-    print(f"❌ Dossier introuvable : {src_dir}")
+if not os.path.exists(src):
+    print(f"❌ Fichier introuvable : {src}")
+    sys.exit(1)
+
+shutil.move(src, main_path)
 
 print("🗑️ Nettoyage du dossier de version...")
 delete(os.path.join(dst, new_version))
@@ -176,60 +165,64 @@ print("✅ Mise à jour terminée. Relance du script...")
 os.execv(sys.executable, [sys.executable, main_path])
 """
 
-# --- Exécution ---
+
+
 def get_all_versions(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}/contents/version"
-    response = requests.get(url)
-    response.raise_for_status()
-    items = response.json()
-
-    versions = []
-    for item in items:
-        if item["type"] == "dir" and item["name"].startswith("V"):
-            versions.append(item["name"])
-
+    r = requests.get(url)
+    if r.status_code != 200:
+        print(f"Erreur HTTP {r.status_code} lors de la récupération des versions.")
+        return []
+    items = r.json()
+    versions = [item["name"] for item in items if item["type"] == "dir" and item["name"].startswith("V")]
     return sorted(versions, key=lambda v: list(map(int, v[1:].split('.'))))
 
-def menu(OWNER, REPO):
+def installer_old_version(v):
+    print("Passage à l'ancienne version (ne désactivez pas votre ordinateur).")
+
+    # injection de la bonne version dans le script de mise à jour
+    script_final = script_mise_a_jour.replace('new_version = ""', f'new_version = "{v}"')
+
+    with open(os.path.join(dst, "transistor_version.py"), "w", encoding="utf-8") as f:
+        f.write(script_final)
+
+    subprocess.Popen([sys.executable, os.path.join(dst, "transistor_version.py")])
+
+# === MENU ===
+
+def menu():
     while True:
-        print("--- Menu ---")
+        print("\n--- Menu ---")
         print(f"Version actuelle : {version_actuelle}")
         print("1. Vérifier si une nouvelle version existe et la télécharger")
-        print("2. Télécharger une version plus ancienne")
+        print("2. Installer une version spécifique (ancienne ou autre)")
         print("3. Quitter")
 
-        choix = input("Entrez votre réponse : ")
-
+        choix = input("Votre choix : ").strip()
         if choix == "1":
-            check_version(version_actuelle, GITHUB_API_URL, script_mise_a_jour)
+            check_version(version_actuelle, GITHUB_API_URL)
         elif choix == "2":
-            print("---Changement de version---")
-
-            versions_disponibles = get_all_versions(OWNER, REPO)
-
-            if not versions_disponibles:
-                print("❌ Aucune version trouvée sur GitHub.")
+            versions = get_all_versions("yo-le-zz", "Version-checker", script_mise_a_jour)
+            if not versions:
+                print("❌ Aucune version disponible.")
                 continue
-            
-            print("Versions disponibles :", ", ".join(versions_disponibles))
-
-            version_ancienne = input("Entrez la version que vous voulez installer : ").strip()
-
-            if version_ancienne not in versions_disponibles:
+            print("Versions disponibles :", ", ".join(versions))
+            v = input("Entrez la version à installer : ").strip()
+            if v not in versions:
                 print("❌ Version inconnue.")
                 continue
+            print(f"Installation de {v}...")
+            installer_old_version(v)
             
-            print(f"Téléchargement de {version_ancienne}...")
-
-            subprocess.Popen([sys.executable, os.path.join(dst, "transistor_version.py")])
-            sys.exit(0)
-
         elif choix == "3":
-            print("Au revoir !")
-            exit(0)
+            print("👋 Au revoir !")
+            break
         else:
-            print("❌ Choix invalide, réessayez.")
+            print("Choix invalide.")
+
 
 if __name__ == "__main__":
+    menu()
 
-    menu(OWNER, REPO)
+
+
