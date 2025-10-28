@@ -5,7 +5,7 @@ import requests
 import subprocess
 
 # Version actuelle
-version_actuelle = "V1.0"
+version_actuelle = "V2.0"
 
 # dossier parent
 dst = os.path.dirname(os.path.abspath(__file__))
@@ -200,9 +200,9 @@ def menu():
 
         choix = input("Votre choix : ").strip()
         if choix == "1":
-            check_version(version_actuelle, GITHUB_API_URL)
+            check_version(version_actuelle, GITHUB_API_URL, script_mise_a_jour)
         elif choix == "2":
-            versions = get_all_versions("yo-le-zz", "Version-checker", script_mise_a_jour)
+            versions = get_all_versions("yo-le-zz", "Version-checker")
             if not versions:
                 print("❌ Aucune version disponible.")
                 continue
