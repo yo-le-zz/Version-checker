@@ -5,7 +5,7 @@ import requests
 import subprocess
 
 # Version actuelle
-version_actuelle = "V1.2"
+version_actuelle = "V2.0"
 
 OWNER = "yo-le-zz"
 REPO = "Version-checker"
@@ -231,4 +231,5 @@ def menu(OWNER, REPO):
             print("❌ Choix invalide, réessayez.")
 
 if __name__ == "__main__":
+
     menu(OWNER, REPO)
