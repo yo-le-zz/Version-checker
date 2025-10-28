@@ -5,13 +5,13 @@ import requests
 import subprocess
 
 # Version actuelle
-version_actuelle = "V1.3"
+version_actuelle = "V1.0"
 
 # dossier parent
 dst = os.path.dirname(os.path.abspath(__file__))
 
-# URL API GitHub (⚠️ pas l'URL HTML)
-GITHUB_API_URL = "https://api.github.com/repos/yo-le-zz/test-version-checker/contents/version"
+# URL API GitHub a remplacer par votre api
+GITHUB_API_URL = "https://api.github.com/repos/yo-le-zz/Version-checker/contents/version"
 
 # --- Fonctions utilitaires ---
 
@@ -169,3 +169,4 @@ os.execv(sys.executable, [sys.executable, main_path])
 check_version(version_actuelle, GITHUB_API_URL, script_mise_a_jour)
 
 print(f"version : {version_actuelle}")
+
