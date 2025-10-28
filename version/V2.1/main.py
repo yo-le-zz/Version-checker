@@ -17,7 +17,7 @@ m = Fore.MAGENTA
 reset = Style.RESET_ALL
 
 # Version actuelle
-version_actuelle = "V2.4"
+version_actuelle = "V2.1"
 
 # dossier parent
 dst = os.path.dirname(os.path.abspath(__file__))
@@ -246,6 +246,7 @@ def menu():
 
 if __name__ == "__main__":
     menu()
+
 
 
 
