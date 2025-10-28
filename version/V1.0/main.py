@@ -135,7 +135,7 @@ def delete(path):
 print("🚀 Téléchargement de la nouvelle version...")
 download_github_folder(
     owner="yo-le-zz",
-    repo="test-version-checker",
+    repo="Version-checker",
     path=f"version/{new_version}",
     output_dir=f"{new_version}"
 )
@@ -169,5 +169,6 @@ os.execv(sys.executable, [sys.executable, main_path])
 check_version(version_actuelle, GITHUB_API_URL, script_mise_a_jour)
 
 print(f"version : {version_actuelle}")
+
 
 
